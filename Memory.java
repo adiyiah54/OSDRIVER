@@ -5,24 +5,28 @@ package osdriver;
 
 public class Memory 
 {
-    public int[] ram;
+    public String[] ram;
     
     
     
     
     public Memory()
     {
-        ram = new int[1024];
+        ram = new String[1024];
     }
     
     
     
     
-    public void write2Ram(int index, int data)
+    public void write2Ram(int index, String data)
     {
         ram[index] = data;
     }
     
+    public String read(int index)
+    {
+        return ram[index];
+    }
     
     public void printRam()
     {

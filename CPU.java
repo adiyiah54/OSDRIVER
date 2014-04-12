@@ -6,7 +6,7 @@ import java.util.Stack;
 public class CPU 
 {
     
-    private int[] regs;
+    private String[] regs;
     private int programcounter;
     private int inputbuffer;
     private int outputbuffer;
@@ -16,18 +16,20 @@ public class CPU
     public CPU()
     {
       //RAM = new String[1024];
-      regs = new int[16];
+      regs = new String[16];
       programcounter = -1;
       inputbuffer = 0;
       outputbuffer = 0;
       tempbuffer = 0;
 
     }
+    
     public void Execute(String instructions, Memory RAM)
     {
         int[] ins;
         ins = decode(instructions);
-        switch(ins[1])
+        
+                switch(ins[1])
         {
             case 0:
             {
@@ -43,18 +45,18 @@ public class CPU
             {
                 if (ins[4] != 0) 
                 { 
-                    regs[ins[2]] = hextodecimal(RAM[ins[4]]); 
+                    regs[ins[2]] = RAM.read(ins[4]); 
                 }
                 else 
                 {
-                    regs[ins[2]] = hextodecimal(RAM[ins[3]]);
+                    regs[ins[2]] = RAM.read(ins[3]);
                 }
                 break;
             }
             case 3:
             {
-                if (ins[4] != 0) { RAM[ins[4]] = decimaltohex(regs[ins[2]]); }
-                else { RAM[ins[3]] = decimaltohex(regs[ins[2]]); }
+                if (ins[4] != 0) { RAM.Write2RAM(ins[4], regs[ins[2]]); }
+                else {  RAM.Write2RAM(ins[3], regs[ins[2]]); }
                 break;
             }
             case 4:
@@ -69,11 +71,11 @@ public class CPU
             case 8:{ regs[ins[4]] = (regs[ins[2]] / regs[ins[3]]); break; }
             case 9:{ regs[ins[4]] = (regs[ins[2]] & regs[ins[3]]); break; }
             case 10:{ regs[ins[4]] = (regs[ins[2]] | regs[ins[3]]); break; }
-            case 11:{ regs[ins[3]] = hextodecimal(RAM[ins[4]]); RAM[ins[4]] = "0"; break; }
-            case 12:{ regs[ins[3]] += hextodecimal(RAM[ins[4]]); break; }
-            case 13:{ regs[ins[3]] *= hextodecimal(RAM[ins[4]]); break; }
-            case 14:{ regs[ins[3]] /= hextodecimal(RAM[ins[4]]); break; }
-            case 15:{ regs[ins[3]] = hextodecimal(RAM[ins[4]]); break; }
+            case 11:{ regs[ins[3]] = RAM.Read(ins[4]); RAM.Write2RAM(ins[4], 0); break; }
+            case 12:{ regs[ins[3]] += RAM.Read(ins[4]); break; }
+            case 13:{ regs[ins[3]] *= RAM.Read(ins[4]); break; }
+            case 14:{ regs[ins[3]] /= RAM.Read(ins[4]); break; }
+            case 15:{ regs[ins[3]] = RAM.Read(ins[4]); break; }
             case 16:
             {
                 if(regs[ins[2]] < regs[ins[3]]) { regs[ins[4]] = 1;}
@@ -82,7 +84,7 @@ public class CPU
             }
             case 17:
             {
-                if(regs[ins[2]] < hextodecimal(RAM[ins[4]])) { regs[ins[3]] = 1;}
+                if(regs[ins[2]] < RAM.Read(ins[4])) { regs[ins[3]] = 1;}
                 else{ regs[ins[3]] = 0; }
                 break;
             }
@@ -231,9 +233,7 @@ public class CPU
     
     return regArray2;
   }
-    public void dispatcher()
-    {
-    }
+  
     
     
     
@@ -247,49 +247,48 @@ public class CPU
 
 
 /* This method assign process with a state of ready to the CPU.This ready queue is based off of the first come, first served scheduling algorithm.*/
-boolean dispatchJobs (ArrayList<PCB> readyQueue, Disk disk , Memory RAM)
+boolean dispatchJobs (ArrayList<PCB> readyQueue, Memory RAM)
 {
 
-PCB currentJob;
-int numberOfJobs= readyQueue.size();
-int completedJobs=0;
+    PCB currentJob;
+    int numberOfJobs = readyQueue.size();
+    int completedJobs = 0;
+
+    if(numberOfJobs == completedJobs || readyQueue.isEmpty() == true) //if empty return false
+    {
+        return false; 
+    }
+
+    while( numberOfJobs!=completedJobs ) 
+    {
+
+        currentJob= readyQueue.get(0);
+
+        /*Grab the process at the top of the queue and change its status to running and assign the process  to the CPU  */
+        final int STATUS_RUNNING = 1;
+        
+        readyQueue.get(0).setStatus(STATUS_RUNNING);
+        
+        for(int i = 0; i <= currentJob.getMemoryEndIndex(); i++)
+        {
+            String instructions = RAM.read(currentJob.getMemoryStartIndex());
+
+            /*Execute of process method goes here*/
+
+            Execute(instructions, RAM);
+        }
+        
+        /*After it is complete, change the status to complete and update the completedJobs count */
+        final int STATUS_COMPLETE = 3;
+        readyQueue.get(0).setStatus(STATUS_COMPLETE);
+        completedJobs++;
+
+        /* Remove the completed process from the queue and reorder the queue.  */
+
+        readyQueue.remove(0);
  
-if(numberOfJobs == completedJobs || readyQueue.isEmpty() == true)
-  {
-  return false;
-  }
-
-   while(numberOfJobs!=completedJobs)
-  {
-
- currentJob= readyQueue.get(0);
-
- /*Grab the process at the top of the queue and change its status to running and assign the process  to the CPU  */
- final int STATUS_RUNNING = 1;
- readyQueue.get(0).setStatus(STATUS_RUNNING);
-
- String instructions= disk.readDiskData(currentJob.getDiskIndex());
-
- /*Execute of process method goes here*/
-
- Execute(instructions, RAM);
-
- /*After it is complete, change the status to complete and update the completedJobs count */
- final int STATUS_COMPLETE = 3;
- readyQueue.get(0).setStatus(STATUS_COMPLETE);
- completedJobs++;
-
- /* Remove the completed process from the queue and reorder the queue.  */
-
- readyQueue.remove(0);
- 
- 
- 
- 
- 
-}
- 
-  return true;
+    }
+    return true;
  
 }
  

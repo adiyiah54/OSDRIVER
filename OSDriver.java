@@ -64,6 +64,16 @@ public class OSDriver
         ShortTermScheduler STS = new ShortTermScheduler();
         STS.FirstComeFirstServe(readyQueue);
         
+        /*
+        for(int i = 0; i < pcbContainer.getCurrentNumOfJob(); i++)
+        {
+            STS.toCPU(i, readyQueue);
+        }
+        */
+        
+        
+        
+        //TEST Show current PCBs
         for(PCB pcb : readyQueue)
         {
             System.out.print(pcb);

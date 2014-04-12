@@ -12,9 +12,9 @@ public class PCB {
     private int tempBuffer;
     private int diskIndex;
     
-    private short[] inputBufferArray;
-    private short[] outputBufferArray;
-    private short[] tempBufferArray;
+    private String[] inputBufferArray;
+    private String[] outputBufferArray;
+    private String[] tempBufferArray;
     
     private int bufferSize;
     private int memoryStartIndex;
@@ -40,9 +40,9 @@ public class PCB {
         tempBuffer = tBuffer;
         diskIndex = dIndex;
         
-        inputBufferArray = new short[iBuffer];
-        outputBufferArray = new short[oBuffer];
-        tempBufferArray = new short[tBuffer];
+        inputBufferArray = new String[iBuffer];
+        outputBufferArray = new String[oBuffer];
+        tempBufferArray = new String[tBuffer];
     }
     
     //get and set
@@ -82,7 +82,7 @@ public class PCB {
     {
         return jobPriority;
     }
-    public void setInputBuffer(short[] input)
+    public void setInputBuffer(String[] input)
     {
         inputBufferArray = input;
     }

@@ -65,39 +65,22 @@ public class LongTermScheduler
             {
                 String instructionBits = getBinaryData(i, disk); //use getBinaryData which return a string of binary converted from hex string
                 
-                short binaryBits1 = Short.valueOf(instructionBits.substring(0,8), 2); // from 0 to 7 substring, converted into short decimal 
-                
-                ram.write2Ram(index++, binaryBits1); //write into the ram array
-
-                short binaryBits2 = Short.valueOf(instructionBits.substring(8,16), 2);
-                
-                ram.write2Ram(index++, binaryBits2);
-
-                short binaryBits3 = Short.valueOf(instructionBits.substring(16,24), 2);
-                
-                ram.write2Ram(index++, binaryBits3);
-
-                short binaryBits4 = Short.valueOf(instructionBits.substring(24,32), 2);
-                
-                ram.write2Ram(index++, binaryBits4);
+                ram.write2Ram(index++, instructionBits);
 
             }
                 
-            short[] temp = new short[dataSize*4]; //temporary store data buffer and expand 4 time cause short can't store 32 range all at once
+            String[] temp = new String[dataSize*4]; //temporary store data buffer and expand 4 time cause short can't store 32 range all at once
 
             String dataBits; // String for buffer data
             int dataStart = pcb.getDiskIndex() + pcb.getJobSize(); // add disk index and job size to obtain the buffer starting index
 
             
             int z = 0; //index
-            while ( z < dataSize * 4 ) 
+            while ( z < dataSize) 
             {
                 dataBits = getBinaryData(dataStart++, disk); 
                 
-                temp[z++] = Short.valueOf(dataBits.substring( 0,8 ), 2);
-                temp[z++] = Short.valueOf(dataBits.substring( 8,16 ), 2);
-                temp[z++] = Short.valueOf(dataBits.substring( 16,24 ), 2);
-                temp[z++] = Short.valueOf(dataBits.substring( 24,32 ), 2);
+                temp[z++] = dataBits;
             }
 
             pcb.setInputBuffer( temp ); //fill the inputBuffer array in the pcb with short binary for inputBuffer
