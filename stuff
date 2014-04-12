@@ -1,0 +1,8 @@
+    public void writeint(int index, int data)
+    {
+      ram[index] = Integer.toBinaryString(int data);
+    }
+    public void readint(int index)
+    {
+       return Integer.parseInt(ram[index], 2);
+    }
