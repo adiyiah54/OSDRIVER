@@ -110,7 +110,14 @@ public class PCB {
     {
         return status;
     }
-    
+    public void OBwrite(int address, String data)
+    {
+        outputBufferArray[(Math.abs(address - jobSize)*4)]  = data;
+    }
+    public String IBread(int address)
+    {
+        return inputBufferArray[(Math.abs(address - jobSize)*4)];
+    }
     public String toString()
     {
         return "JobID: "+ jobNum + " Priority: " + jobPriority + "\n";
