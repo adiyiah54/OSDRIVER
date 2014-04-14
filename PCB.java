@@ -111,7 +111,6 @@ public class PCB {
         return status;
     }
     
-    
     public String toString()
     {
         return "JobID: "+ jobNum + " Priority: " + jobPriority + "\n";

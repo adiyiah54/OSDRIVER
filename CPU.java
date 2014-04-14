@@ -5,7 +5,7 @@ import java.util.Stack;
 
 public class CPU 
 {
-    
+    PCB current;
     private String[] regs;
     private int programcounter;
     private int inputbuffer;
@@ -33,7 +33,7 @@ public class CPU
         {
             case 0:
             {
-                regs[0] = inputbuffer;
+                regs[0] = current.
                 break;
             }
             case 1:
@@ -45,18 +45,18 @@ public class CPU
             {
                 if (ins[4] != 0) 
                 { 
-                    regs[ins[2]] = RAM.read(ins[4]); 
+                    regs[ins[2]] = RAM.readint(ins[4]); 
                 }
                 else 
                 {
-                    regs[ins[2]] = RAM.read(ins[3]);
+                    regs[ins[2]] = RAM.readint(ins[3]);
                 }
                 break;
             }
             case 3:
             {
-                if (ins[4] != 0) { RAM.Write2RAM(ins[4], regs[ins[2]]); }
-                else {  RAM.Write2RAM(ins[3], regs[ins[2]]); }
+                if (ins[4] != 0) { RAM.writeint(ins[4], regs[ins[2]]); }
+                else {  RAM.writeint(ins[3], regs[ins[2]]); }
                 break;
             }
             case 4:
@@ -65,17 +65,17 @@ public class CPU
                 else { regs[ins[4]] = regs[ins[3]]; regs[ins[3]] = 0; }
                 break;
             }
-            case 5:{ regs[ins[4]] = (regs[ins[2]] + regs[ins[3]]); break; }
-            case 6:{ regs[ins[4]] = (regs[ins[2]] - regs[ins[3]]); break; }
-            case 7:{ regs[ins[4]] = (regs[ins[2]] * regs[ins[3]]); break; }
-            case 8:{ regs[ins[4]] = (regs[ins[2]] / regs[ins[3]]); break; }
-            case 9:{ regs[ins[4]] = (regs[ins[2]] & regs[ins[3]]); break; }
-            case 10:{ regs[ins[4]] = (regs[ins[2]] | regs[ins[3]]); break; }
-            case 11:{ regs[ins[3]] = RAM.Read(ins[4]); RAM.Write2RAM(ins[4], 0); break; }
-            case 12:{ regs[ins[3]] += RAM.Read(ins[4]); break; }
-            case 13:{ regs[ins[3]] *= RAM.Read(ins[4]); break; }
-            case 14:{ regs[ins[3]] /= RAM.Read(ins[4]); break; }
-            case 15:{ regs[ins[3]] = RAM.Read(ins[4]); break; }
+            case 5:{ regs[ins[4]] = Integer.toBinaryString(Integer.parseInt(regs[ins[2]], 2) + Integer.parseInt(regs[ins[3]], 2)); break; }
+            case 6:{ regs[ins[4]] = Integer.toBinaryString(Integer.parseInt(regs[ins[2]], 2) - Integer.parseInt(regs[ins[3]], 2)); break; }
+            case 7:{ regs[ins[4]] = Integer.toBinaryString(Integer.parseInt(regs[ins[2]], 2) * Integer.parseInt(regs[ins[3]], 2)); break; }
+            case 8:{ regs[ins[4]] = Integer.toBinaryString(Integer.parseInt(regs[ins[2]], 2) / Integer.parseInt(regs[ins[3]], 2)); break; }
+            case 9:{ regs[ins[4]] = Integer.toBinaryString(Integer.parseInt(regs[ins[2]], 2) & Integer.parseInt(regs[ins[3]], 2)); break; }
+            case 10:{ regs[ins[4]] = Integer.toBinaryString(Integer.parseInt(regs[ins[2]], 2) | Integer.parseInt(regs[ins[3]], 2)); break; }
+            case 11:{ regs[ins[3]] = RAM.read(ins[4]); RAM.writeint(ins[4], 0); break; }
+            case 12:{ regs[ins[3]] += RAM.readint(ins[4]); break; }
+            case 13:{ regs[ins[3]] *= Integer.toBinaryString(RAM.readint(ins[4])); break; }
+            case 14:{ regs[ins[3]] /= RAM.readint(ins[4]); break; }
+            case 15:{ regs[ins[3]] = RAM.readint(ins[4]); break; }
             case 16:
             {
                 if(regs[ins[2]] < regs[ins[3]]) { regs[ins[4]] = 1;}
@@ -84,7 +84,7 @@ public class CPU
             }
             case 17:
             {
-                if(regs[ins[2]] < RAM.Read(ins[4])) { regs[ins[3]] = 1;}
+                if(regs[ins[2]] < RAM.readint(ins[4])) { regs[ins[3]] = 1;}
                 else{ regs[ins[3]] = 0; }
                 break;
             }
@@ -108,7 +108,7 @@ public class CPU
     {
       size = x;
     }
-    public void setRegs(int x, int y)//set registers value
+    public void setRegs(String x, int y)//set registers value
     {
       regs[y]= x;
     }
@@ -116,7 +116,7 @@ public class CPU
     {
       return programcounter;
     }
-    public int[] getRegs()//returns cpu registers
+    public String[] getRegs()//returns cpu registers
     {
       return regs;
     }
@@ -124,6 +124,7 @@ public class CPU
     {
       return size;
     }
+    /*
     public String convert(String str)//converts hex to binary
     {
       int x = 0;
@@ -151,7 +152,8 @@ public class CPU
       return binary;
       
     }
-    //dummy
+    */
+    /*
     private int hexToDecimal(String hex)//converts hex to decimal
     {
       String hexDigit ="0123456789ABCDEF";
@@ -165,7 +167,8 @@ public class CPU
       }
         return hexVal;
     }
-    //dummy
+    */
+    /*
     private String decimalToHex(int dec)//converts decimal to hex
     {
       int x =16;
@@ -176,6 +179,7 @@ public class CPU
       dec = dec / x;
       return hex;
     }
+    */
     //The array of ints from Chuku's example seems like the
     //path of least resistance here, so the decode method
     //should return an array of ints with the right data
@@ -263,7 +267,7 @@ boolean dispatchJobs (ArrayList<PCB> readyQueue, Memory RAM)
     {
 
         currentJob= readyQueue.get(0);
-
+        current = currentJob;
         /*Grab the process at the top of the queue and change its status to running and assign the process  to the CPU  */
         final int STATUS_RUNNING = 1;
         
